@@ -1384,10 +1384,20 @@ services:
         context: ./ide-theia
       volumes:
         - ${APP_CODE_PATH_HOST}:/home/project
-      ports:
-        - "${IDE_THEIA_PORT}:3000"
       networks:
         - backend
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.ide-theia.loadbalancer.server.port=3000"
+        - "traefik.http.routers.ide-theia.rule=Host(`${HOST_DOMAIN}`)"
+        - "traefik.http.routers.ide-theia.entrypoints=ide-theia"
+        - "traefik.http.routers.ide-theia.service=ide-theia"
+        - "traefik.http.routers.ide-theia.tls.certresolver=letsencrypt"
+        # middlewares
+        - "traefik.http.routers.ide-theia.middlewares=ide-theia-auth"
+        - "traefik.http.middlewares.ide-theia-auth.basicauth.realm=Login Required"
+        - "traefik.http.middlewares.ide-theia-auth.basicauth.users=${IDE_THEIA_USER}"
+        
 
 ### IDE-WEBIDE ################################################
     ide-webide:
@@ -1644,6 +1654,7 @@ services:
         - "--entrypoints.http.http.redirections.entrypoint.to=https"
         - "--entrypoints.https.address=:${NGINX_HOST_HTTPS_PORT}"
         - "--entrypoints.laravel-echo-server.address=:${LARAVEL_ECHO_SERVER_PORT}"
+        - "--entrypoints.ide-theia.address=:${IDE_THEIA_PORT}"
         - "--entrypoints.traefik.address=:${TRAEFIK_DASHBOARD_PORT}"
         # certificatesresolvers
         - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
@@ -1654,6 +1665,7 @@ services:
         - "${NGINX_HOST_HTTPS_PORT}:${TRAEFIK_HOST_HTTPS_PORT}"
         - "${TRAEFIK_DASHBOARD_PORT}:${TRAEFIK_DASHBOARD_PORT}"
         - "${LARAVEL_ECHO_SERVER_PORT}:${LARAVEL_ECHO_SERVER_PORT}"
+        - "${IDE_THEIA_PORT}:${IDE_THEIA_PORT}"
       networks:
         - frontend
         - backend
