@@ -291,7 +291,7 @@ services:
         - "traefik.http.routers.https.service=nginx"
         - "traefik.http.routers.https.tls.certresolver=letsencrypt"
         # http router
-        - "traefik.http.routers.http.rule=Host(`${HOST_DOMAIN}, `www.${HOST_DOMAIN}``)"
+        - "traefik.http.routers.http.rule=Host(`${HOST_DOMAIN}`, `www.${HOST_DOMAIN}`)"
         - "traefik.http.routers.http.entrypoints=http"
         - "traefik.http.routers.http.middlewares=http-redirectscheme"
         - "traefik.http.routers.http.service=nginx"
@@ -457,9 +457,9 @@ services:
         - "--providers.docker.exposedbydefault=false"
         - "--accesslog.filepath=/data/access.log"
         # entrypoints
-        - "--entrypoints.http.address=:${NGINX_HOST_HTTP_PORT}"
+        - "--entrypoints.http.address=:${TRAEFIK_HOST_HTTP_PORT}"
         - "--entrypoints.http.http.redirections.entrypoint.to=https"
-        - "--entrypoints.https.address=:${NGINX_HOST_HTTPS_PORT}"
+        - "--entrypoints.https.address=:${TRAEFIK_HOST_HTTPS_PORT}"
         - "--entrypoints.laravel-echo-server.address=:${LARAVEL_ECHO_SERVER_PORT}"
         - "--entrypoints.ide-theia.address=:${IDE_THEIA_PORT}"
         - "--entrypoints.traefik.address=:${TRAEFIK_DASHBOARD_PORT}"
@@ -468,8 +468,8 @@ services:
         - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
         - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http"
       ports:
-        - "${NGINX_HOST_HTTP_PORT}:${TRAEFIK_HOST_HTTP_PORT}"
-        - "${NGINX_HOST_HTTPS_PORT}:${TRAEFIK_HOST_HTTPS_PORT}"
+        - "${TRAEFIK_HOST_HTTP_PORT}:${TRAEFIK_HOST_HTTP_PORT}"
+        - "${TRAEFIK_HOST_HTTPS_PORT}:${TRAEFIK_HOST_HTTPS_PORT}"
         - "${TRAEFIK_DASHBOARD_PORT}:${TRAEFIK_DASHBOARD_PORT}"
         - "${LARAVEL_ECHO_SERVER_PORT}:${LARAVEL_ECHO_SERVER_PORT}"
         - "${IDE_THEIA_PORT}:${IDE_THEIA_PORT}"
